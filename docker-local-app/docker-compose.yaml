@@ -1,0 +1,53 @@
+version: '3.7'
+
+services:
+  db_local_app:
+    build:
+      context: database
+      dockerfile: mssql.Dockerfile
+    container_name: local_ms_sql_server
+    restart: on-failure
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_DATABASE_NAME: local_app
+      MSSQL_SA_PASSWORD: paSSw0rd!
+      MSSQL_COLLATION: SQL_Latin1_General_CP1_CS_AS_UTF8
+    volumes:
+      - ~/apps/mssql/data:/var/lib/db/data
+    ports:
+      - "1500:1433"
+  activemq:
+    build:
+      context: messages/artemisMQ
+    restart: on-failure
+    container_name: local_artemis_mq
+    environment:
+      ARTEMIS_USERNAME: admin
+      ARTEMIS_PASSWORD: admin
+    ports:
+      - "5673:5672"
+      - "8162:8161"
+      - "61617:61616"
+  rabbitmq:
+    image: rabbitmq:management
+    restart: on-failure
+    container_name: local_rabbit_mq
+    ports:
+      - "5674:5672"
+      - "15672:15672"
+  zookeeper:
+    image: wurstmeister/zookeeper
+    restart: on-failure
+    ports:
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    restart: on-failure
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    depends_on:
+      - zookeeper

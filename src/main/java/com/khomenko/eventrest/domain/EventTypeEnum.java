@@ -4,4 +4,6 @@
  */
 package com.khomenko.eventrest.domain;
 
-public class Event {}
+public enum EventTypeEnum {
+    WORKSHOP, TECH_TALK;
+}

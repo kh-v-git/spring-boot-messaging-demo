@@ -1,0 +1,70 @@
+spring:
+  profiles:
+    active: local, kafka
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1500;databaseName=local_app;encrypt=true;trustServerCertificate=true;
+    username: SA
+    password: paSSw0rd!
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    database-platform: org.hibernate.dialect.SQLServerDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        show_sql: false
+        format_sql: true
+        hbm2ddl:
+          delimiter: ';'
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    user: SA
+    password: paSSw0rd!
+    url: jdbc:sqlserver://localhost:1500;databaseName=local_app;encrypt=true;trustServerCertificate=true;
+    schemas: local_app
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.khomenko.eventrest: info
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+
+application:
+  message:
+    queue:
+      create-event-queue: create-event-notification
+      update-event-queue: update-event-notification
+      delete-event-queue: delete-event-notification
+
+---
+spring:
+  config:
+    activate:
+      on-profile: activemq
+    import: application-activemq.yaml
+---
+spring:
+  config:
+    activate:
+      on-profile: rabbitmq
+    import: application-rabbitmq.yaml
+---
+spring:
+  config:
+    activate:
+      on-profile: kafka
+    import: application-kafka.yaml
+---
+
